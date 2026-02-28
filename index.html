@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oi como você tá</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f7; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 350px; }
+        h1 { color: #2d3436; font-size: 24px; margin-bottom: 10px; }
+        p { color: #636e72; font-size: 16px; }
+        .status { margin: 20px 0; padding: 15px; border-radius: 10px; background: #f0f0f0; font-weight: bold; }
+        .location-box { font-family: monospace; background: #2d3436; color: #fab1a0; padding: 10px; border-radius: 8px; display: none; margin-top: 15px; }
+        .btn-track { background: #00b894; color: white; border: none; padding: 12px 25px; border-radius: 50px; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .btn-track:hover { background: #55efc4; }
+        .footer { margin-top: 20px; font-size: 12px; color: #b2bec3; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>Oi como você tá? 👋</h1>
+    <p>Vamos encontrar seu amiguinho!</p>
+    
+    <button class="btn-track" onclick="getLocation()">Rastrear Agora</button>
+    
+    <div id="status" class="status">Aguardando sinal...</div>
+    
+    <div id="result" class="location-box"></div>
+    
+    <div id="mapLink"></div>
+
+    <div class="footer">O app precisa de permissão de GPS para funcionar.</div>
+</div>
+
+<script>
+    const statusDiv = document.getElementById('status');
+    const resultDiv = document.getElementById('result');
+    const mapLink = document.getElementById('mapLink');
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            statusDiv.innerHTML = "🛰️ Localizando...";
+            // watchPosition atualiza o local se o amigo se mexer
+            navigator.geolocation.watchPosition(showPosition, showError, {
+                enableHighAccuracy: true
+            });
+        } else {
+            statusDiv.innerHTML = "❌ GPS não suportado.";
+        }
+    }
+
+    function showPosition(position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        
+        statusDiv.innerHTML = "✅ Localizado!";
+        statusDiv.style.color = "#00b894";
+        
+        resultDiv.style.display = "block";
+        resultDiv.innerHTML = `Lat: ${lat.toFixed(5)}<br>Lon: ${lon.toFixed(5)}`;
+        
+        // Cria um link direto para o Google Maps
+        mapLink.innerHTML = `<br><a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank" style="color: #0984e3; text-decoration: none; font-weight: bold;">📍 Ver no Google Maps</a>`;
+    }
+
+    function showError(error) {
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                statusDiv.innerHTML = "Permissão negada pelo usuário.";
+                break;
+            case error.POSITION_UNAVAILABLE:
+                statusDiv.innerHTML = "Sinal de localização indisponível.";
+                break;
+            case error.TIMEOUT:
+                statusDiv.innerHTML = "Tempo de busca esgotado.";
+                break;
+            default:
+                statusDiv.innerHTML = "Erro desconhecido.";
+        }
+    }
+</script>
+
+</body>
+</html>
